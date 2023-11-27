@@ -3,10 +3,12 @@
 
 using namespace std;
 
-void Ejecutar();
-
 int main(){
-    Ejecutar();
+    Juego *juego = new Juego();
+    juego -> ejecutar();
     return 0;
 }
+
+
+
 
