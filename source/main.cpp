@@ -1,6 +1,5 @@
 #include <iostream>
 #include "Conecta4/Tablero.h"
-#include "Conecta4/Juego.h"
 
 using namespace std;
 
@@ -26,9 +25,9 @@ int menu(){
 };
 
 void ejecutarOpcion(int opcion){
-    Juego *juego = new Juego();
+    Tablero *tablero = new Tablero();
     if(opcion == 1){
-        juego ->ejecutar();
+        tablero ->playAgainstAI();
     }else if(opcion == 9){
         cout<<"Hasta pronto"<<endl;
     }

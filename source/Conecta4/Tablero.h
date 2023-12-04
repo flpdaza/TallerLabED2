@@ -35,7 +35,7 @@ class Tablero{
         cout << "-----------------------------" << endl;
     };
 
-    bool encontrarFilaVacia(int){        
+    bool encontrarFilaVacia(int col){        
         if (col < 0 || col >= COLS) {
             cout << "Columna fuera de rango. Introduce un número válido (0-" << COLS - 1 << ")." << endl;
             return false;
@@ -201,7 +201,7 @@ class Tablero{
         return score;
     }
     int minimax(int depth, int alpha, int beta, bool maximizingPlayer) {
-        if (depth == 0 || checkWin()) {
+        if (depth == 0 || verificarGanador()) {
             return scorePosition(board);
         }
 
@@ -271,8 +271,8 @@ class Tablero{
                 cin >> col;
 
                 if (isValidMove(col)) {
-                    dropPiece(col);
-                    if (checkWin()) {
+                    encontrarFilaVacia(col);
+                    if (verificarGanador()) {
                         printBoard();
                         cout << "¡Jugador " << currentPlayer << " ha ganado!" << endl;
                         gameover = true;
@@ -283,8 +283,8 @@ class Tablero{
             } else {
                 int aiMove = getBestMove();
                 if (isValidMove(aiMove)) {
-                    dropPiece(aiMove);
-                    if (checkWin()) {
+                    encontrarFilaVacia(aiMove);
+                    if (verificarGanador()) {
                         printBoard();
                         cout << "¡IA ha ganado!" << endl;
                         gameover = true;
