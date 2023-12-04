@@ -1,1 +1,3 @@
 # TallerLabED2
+este juego cuenta con la clase main y la clase tablero, esta última tiene las funcionalidades principales para que el juego se desarrolle bien, mientras que la clase main se encarga de manejar el menú y ejecutar los metodos que sean necesarios. 
+En el juego conecta 4 se aplicó el algoritmo minimax con poda alfabeta, minimax es un algoritmo que le permite a la ia encontrar el mejor movimiento posible a realiza. Este algoritmo por si solo es rapido y eficiente, pero se le aplicó también la poda para hacerlo aún mas "inteligente" y eficiente ya que la poda permite que no tenga que verificar todas las jugadas para elegir la mejor, ahorrando tiempo

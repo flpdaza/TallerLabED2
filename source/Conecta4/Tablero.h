@@ -108,7 +108,7 @@ class Tablero{
 
         return false;
     };
-
+    //Revisa si es un movimiento valido
     bool movimientoValido(int col) {
         if (col >= 0 && col < COLUMNAS && board[0][col] == VACIO) {
             return true;
@@ -125,7 +125,7 @@ class Tablero{
         }
         return -1;
     }
-
+    //Revisa el puntaje de la posicion actual para el minimax
     int puntajePosicion(vector<vector<char>>& board) {
         int puntaje = 0;
 
@@ -207,7 +207,7 @@ class Tablero{
 
         return puntaje;
     }
-
+    //algoritmo prinicipal que se encarga de decidir el mejor movimiento para la IA
     int minimax(int PROFUNDIDAD, int alpha, int beta, bool maximizador) {
         if (PROFUNDIDAD == 0 || verificarGanador()) {
             return puntajePosicion(board);
