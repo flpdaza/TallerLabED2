@@ -5,29 +5,30 @@
 
 using namespace std;
 
-const int ROWS = 6;
-const int COLS = 7;
-const char EMPTY = ' ';
-const char PLAYER1 = 'X';
-const char PLAYER2 = 'O';
-const int DEPTH = 6; // Profundidad máxima de búsqueda para el algoritmo minimax
+const int FILAS = 6;
+const int COLUMNAS = 7;
+const char VACIO = ' ';
+const char JUGADOR1 = 'X';
+const char JUGADOR2 = 'O';
 
 class Tablero{
     private:
     vector<vector<char>> board;
-    int currentPlayer;
+    int jugadorActual;
+    int PROFUNDIDAD;
     public:
-    Tablero(){
-        board = vector<vector<char>>(ROWS, vector<char>(COLS, EMPTY));
-        currentPlayer = 1;
+    Tablero(int profundidad){
+        board = vector<vector<char>>(FILAS, vector<char>(COLUMNAS, VACIO));
+        jugadorActual = 1;
+        this -> PROFUNDIDAD = profundidad;
     };
     ~Tablero(){
         cout << "Destructor" << endl;
     };
 
     void printBoard(){
-        for (int i = 0; i < ROWS; ++i) {
-            for (int j = 0; j < COLS; ++j) {
+        for (int i = 0; i < FILAS; ++i) {
+            for (int j = 0; j < COLUMNAS; ++j) {
                 cout << "| " << board[i][j] << " ";
             }
             cout << "|" << endl;
@@ -35,15 +36,20 @@ class Tablero{
         cout << "-----------------------------" << endl;
     };
 
-    bool encontrarFilaVacia(int col){        
-        if (col < 0 || col >= COLS) {
-            cout << "Columna fuera de rango. Introduce un número válido (0-" << COLS - 1 << ")." << endl;
+    //pone la ficha en la columna indicada, si esta vacia o es un numero invalido, retorna false
+    bool ponerFicha(int col){        
+        if (col < 0 || col >= COLUMNAS) {
+            cout << "Columna fuera de rango. Introduce un número válido (0-" << COLUMNAS - 1 << ")." << endl;
             return false;
         }
 
-        for (int i = ROWS - 1; i >= 0; --i) {
-            if (board[i][col] == EMPTY) {
-                board[i][col] = (currentPlayer == 1) ? PLAYER1 : PLAYER2;
+        for (int i = FILAS - 1; i >= 0; --i) {
+            if (board[i][col] == VACIO) {
+                if(jugadorActual == 1){
+                    board[i][col] = JUGADOR1;
+                }else{
+                    board[i][col] = JUGADOR2;
+                }
                 return true;
             }
         }
@@ -52,10 +58,13 @@ class Tablero{
         return false;
     
     };
-    bool verificarGanador(){// Verificación horizontal
-        for (int i = 0; i < ROWS; ++i) {
-            for (int j = 0; j < COLS - 3; ++j) {
-                if (board[i][j] != EMPTY &&
+
+    //Verifica si hay un ganador revisando las posibles combinaciones
+    bool verificarGanador(){
+
+        for (int i = 0; i < FILAS; ++i) {
+            for (int j = 0; j < COLUMNAS - 3; ++j) {
+                if (board[i][j] != VACIO &&
                     board[i][j] == board[i][j + 1] &&
                     board[i][j] == board[i][j + 2] &&
                     board[i][j] == board[i][j + 3]) {
@@ -64,10 +73,9 @@ class Tablero{
             }
         }
 
-        // Verificación vertical
-        for (int i = 0; i < ROWS - 3; ++i) {
-            for (int j = 0; j < COLS; ++j) {
-                if (board[i][j] != EMPTY &&
+        for (int i = 0; i < FILAS - 3; ++i) {
+            for (int j = 0; j < COLUMNAS; ++j) {
+                if (board[i][j] != VACIO &&
                     board[i][j] == board[i + 1][j] &&
                     board[i][j] == board[i + 2][j] &&
                     board[i][j] == board[i + 3][j]) {
@@ -76,10 +84,9 @@ class Tablero{
             }
         }
 
-        // Verificación diagonal ascendente
-        for (int i = 3; i < ROWS; ++i) {
-            for (int j = 0; j < COLS - 3; ++j) {
-                if (board[i][j] != EMPTY &&
+        for (int i = 3; i < FILAS; ++i) {
+            for (int j = 0; j < COLUMNAS - 3; ++j) {
+                if (board[i][j] != VACIO &&
                     board[i][j] == board[i - 1][j + 1] &&
                     board[i][j] == board[i - 2][j + 2] &&
                     board[i][j] == board[i - 3][j + 3]) {
@@ -88,10 +95,9 @@ class Tablero{
             }
         }
 
-        // Verificación diagonal descendente
-        for (int i = 3; i < ROWS; ++i) {
-            for (int j = 3; j < COLS; ++j) {
-                if (board[i][j] != EMPTY &&
+        for (int i = 3; i < FILAS; ++i) {
+            for (int j = 3; j < COLUMNAS; ++j) {
+                if (board[i][j] != VACIO &&
                     board[i][j] == board[i - 1][j - 1] &&
                     board[i][j] == board[i - 2][j - 2] &&
                     board[i][j] == board[i - 3][j - 3]) {
@@ -102,194 +108,203 @@ class Tablero{
 
         return false;
     };
-    bool isValidMove(int col) {
-        return col >= 0 && col < COLS && board[0][col] == EMPTY;
+
+    bool movimientoValido(int col) {
+        if (col >= 0 && col < COLUMNAS && board[0][col] == VACIO) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
-    int getLastEmptyRow(int col) {
-        for (int i = ROWS - 1; i >= 0; --i) {
-            if (board[i][col] == EMPTY) {
+    int obtenerFilaVacia(int col) {
+        for (int i = FILAS - 1; i >= 0; --i) {
+            if (board[i][col] == VACIO) {
                 return i;
             }
         }
         return -1;
     }
 
-    int scorePosition(vector<vector<char>>& board) {
-        int score = 0;
+    int puntajePosicion(vector<vector<char>>& board) {
+        int puntaje = 0;
 
-        // Horizontal
-        for (int i = 0; i < ROWS; ++i) {
-            for (int j = 0; j < COLS - 3; ++j) {
-                int countPlayer1 = 0;
-                int countPlayer2 = 0;
+        for (int i = 0; i < FILAS; ++i) {
+            for (int j = 0; j < COLUMNAS - 3; ++j) {
+                int contJugador1 = 0;
+                int contJUGADOR2 = 0;
                 for (int k = 0; k < 4; ++k) {
-                    if (board[i][j + k] == PLAYER1) {
-                        countPlayer1++;
-                    } else if (board[i][j + k] == PLAYER2) {
-                        countPlayer2++;
+                    if (board[i][j + k] == JUGADOR1) {
+                        contJugador1++;
+                    } else if (board[i][j + k] == JUGADOR2) {
+                        contJUGADOR2++;
                     }
                 }
-                if (countPlayer1 > 0 && countPlayer2 == 0) {
-                    score += countPlayer1 * countPlayer1 * countPlayer1;
-                } else if (countPlayer2 > 0 && countPlayer1 == 0) {
-                    score -= countPlayer2 * countPlayer2 * countPlayer2;
+                if (contJugador1 > 0 && contJUGADOR2 == 0) {
+                    puntaje += contJugador1 * contJugador1 * contJugador1;
+                } else if (contJUGADOR2 > 0 && contJugador1 == 0) {
+                    puntaje -= contJUGADOR2 * contJUGADOR2 * contJUGADOR2;
                 }
             }
         }
 
-        // Vertical
-        for (int i = 0; i < ROWS - 3; ++i) {
-            for (int j = 0; j < COLS; ++j) {
-                int countPlayer1 = 0;
-                int countPlayer2 = 0;
+        for (int i = 0; i < FILAS - 3; ++i) {
+            for (int j = 0; j < COLUMNAS; ++j) {
+                int contJugador1 = 0;
+                int contJUGADOR2 = 0;
                 for (int k = 0; k < 4; ++k) {
-                    if (board[i + k][j] == PLAYER1) {
-                        countPlayer1++;
-                    } else if (board[i + k][j] == PLAYER2) {
-                        countPlayer2++;
+                    if (board[i + k][j] == JUGADOR1) {
+                        contJugador1++;
+                    } else if (board[i + k][j] == JUGADOR2) {
+                        contJUGADOR2++;
                     }
                 }
-                if (countPlayer1 > 0 && countPlayer2 == 0) {
-                    score += countPlayer1 * countPlayer1 * countPlayer1;
-                } else if (countPlayer2 > 0 && countPlayer1 == 0) {
-                    score -= countPlayer2 * countPlayer2 * countPlayer2;
+                if (contJugador1 > 0 && contJUGADOR2 == 0) {
+                    puntaje += contJugador1 * contJugador1 * contJugador1;
+                } else if (contJUGADOR2 > 0 && contJugador1 == 0) {
+                    puntaje -= contJUGADOR2 * contJUGADOR2 * contJUGADOR2;
                 }
             }
         }
 
-        // Diagonal ascendente
-        for (int i = 3; i < ROWS; ++i) {
-            for (int j = 0; j < COLS - 3; ++j) {
-                int countPlayer1 = 0;
-                int countPlayer2 = 0;
+        for (int i = 3; i < FILAS; ++i) {
+            for (int j = 0; j < COLUMNAS - 3; ++j) {
+                int contJugador1 = 0;
+                int contJUGADOR2 = 0;
                 for (int k = 0; k < 4; ++k) {
-                    if (board[i - k][j + k] == PLAYER1) {
-                        countPlayer1++;
-                    } else if (board[i - k][j + k] == PLAYER2) {
-                        countPlayer2++;
+                    if (board[i - k][j + k] == JUGADOR1) {
+                        contJugador1++;
+                    } else if (board[i - k][j + k] == JUGADOR2) {
+                        contJUGADOR2++;
                     }
                 }
-                if (countPlayer1 > 0 && countPlayer2 == 0) {
-                    score += countPlayer1 * countPlayer1 * countPlayer1;
-                } else if (countPlayer2 > 0 && countPlayer1 == 0) {
-                    score -= countPlayer2 * countPlayer2 * countPlayer2;
+                if (contJugador1 > 0 && contJUGADOR2 == 0) {
+                    puntaje += contJugador1 * contJugador1 * contJugador1;
+                } else if (contJUGADOR2 > 0 && contJugador1 == 0) {
+                    puntaje -= contJUGADOR2 * contJUGADOR2 * contJUGADOR2;
                 }
             }
         }
 
-        // Diagonal descendente
-        for (int i = 3; i < ROWS; ++i) {
-            for (int j = 3; j < COLS; ++j) {
-                int countPlayer1 = 0;
-                int countPlayer2 = 0;
+        for (int i = 3; i < FILAS; ++i) {
+            for (int j = 3; j < COLUMNAS; ++j) {
+                int contJugador1 = 0;
+                int contJUGADOR2 = 0;
                 for (int k = 0; k < 4; ++k) {
-                    if (board[i - k][j - k] == PLAYER1) {
-                        countPlayer1++;
-                    } else if (board[i - k][j - k] == PLAYER2) {
-                        countPlayer2++;
+                    if (board[i - k][j - k] == JUGADOR1) {
+                        contJugador1++;
+                    } else if (board[i - k][j - k] == JUGADOR2) {
+                        contJUGADOR2++;
                     }
                 }
-                if (countPlayer1 > 0 && countPlayer2 == 0) {
-                    score += countPlayer1 * countPlayer1 * countPlayer1;
-                } else if (countPlayer2 > 0 && countPlayer1 == 0) {
-                    score -= countPlayer2 * countPlayer2 * countPlayer2;
+                if (contJugador1 > 0 && contJUGADOR2 == 0) {
+                    puntaje += contJugador1 * contJugador1 * contJugador1;
+                } else if (contJUGADOR2 > 0 && contJugador1 == 0) {
+                    puntaje -= contJUGADOR2 * contJUGADOR2 * contJUGADOR2;
                 }
             }
         }
 
-        return score;
+        return puntaje;
     }
-    int minimax(int depth, int alpha, int beta, bool maximizingPlayer) {
-        if (depth == 0 || verificarGanador()) {
-            return scorePosition(board);
+
+    int minimax(int PROFUNDIDAD, int alpha, int beta, bool maximizador) {
+        if (PROFUNDIDAD == 0 || verificarGanador()) {
+            return puntajePosicion(board);
         }
 
-        if (maximizingPlayer) {
-            int maxScore = INT_MIN;
-            for (int col = 0; col < COLS; ++col) {
-                if (isValidMove(col)) {
-                    int row = getLastEmptyRow(col);
-                    board[row][col] = PLAYER1;
-                    int score = minimax(depth - 1, alpha, beta, false);
-                    board[row][col] = EMPTY;
-                    maxScore = max(maxScore, score);
-                    alpha = max(alpha, score);
+        if (maximizador) {
+            int maxpuntaje = INT_MIN;
+            for (int col = 0; col < COLUMNAS; ++col) {
+                if (movimientoValido(col)) {
+                    int fila = obtenerFilaVacia(col);
+                    board[fila][col] = JUGADOR1;
+                    int puntaje = minimax(PROFUNDIDAD - 1, alpha, beta, false);
+                    board[fila][col] = VACIO;
+                    maxpuntaje = max(maxpuntaje, puntaje);
+                    alpha = max(alpha, puntaje);
                     if (beta <= alpha) {
                         break;
                     }
                 }
             }
-            return maxScore;
+            return maxpuntaje;
         } else {
-            int minScore = INT_MAX;
-            for (int col = 0; col < COLS; ++col) {
-                if (isValidMove(col)) {
-                    int row = getLastEmptyRow(col);
-                    board[row][col] = PLAYER2;
-                    int score = minimax(depth - 1, alpha, beta, true);
-                    board[row][col] = EMPTY;
-                    minScore = min(minScore, score);
-                    beta = min(beta, score);
+            int minpuntaje = INT_MAX;
+            for (int col = 0; col < COLUMNAS; ++col) {
+                if (movimientoValido(col)) {
+                    int fila = obtenerFilaVacia(col);
+                    board[fila][col] = JUGADOR2;
+                    int puntaje = minimax(PROFUNDIDAD - 1, alpha, beta, true);
+                    board[fila][col] = VACIO;
+                    minpuntaje = min(minpuntaje, puntaje);
+                    beta = min(beta, puntaje);
                     if (beta <= alpha) {
                         break;
                     }
                 }
             }
-            return minScore;
+            return minpuntaje;
         }
     }
 
-    int getBestMove() {
-        int bestMove = -1;
-        int bestScore = INT_MIN;
+    int mejorMovimiento() {
+        int mejorMovimiento = -1;
+        int mejorPuntaje = INT_MIN;
 
-        for (int col = 0; col < COLS; ++col) {
-            if (isValidMove(col)) {
-                int row = getLastEmptyRow(col);
-                board[row][col] = PLAYER1;
-                int score = minimax(DEPTH, INT_MIN, INT_MAX, false);
-                board[row][col] = EMPTY;
-                if (score > bestScore) {
-                    bestScore = score;
-                    bestMove = col;
+        for (int col = 0; col < COLUMNAS; ++col) {
+            if (movimientoValido(col)) {
+                int fila = obtenerFilaVacia(col);
+                board[fila][col] = JUGADOR1;
+                int puntaje = minimax(PROFUNDIDAD, INT_MIN, INT_MAX, false);
+                board[fila][col] = VACIO;
+                if (puntaje > mejorPuntaje) {
+                    mejorPuntaje = puntaje;
+                    mejorMovimiento = col;
                 }
             }
         }
 
-        return bestMove;
+        return mejorMovimiento;
     }
-    void playAgainstAI() {
-        bool gameover = false;
 
-        while (!gameover) {
+    void jugarContraPC() {
+        bool fin = false;
+
+        while (!fin) {
             printBoard();
 
-            if (currentPlayer == 1) {
-                cout << "Turno del jugador " << currentPlayer << ". Elige una columna (0-" << COLS - 1 << "): ";
+            if (jugadorActual == 1) {
+                cout << "Turno del jugador " << jugadorActual << ". Elige una columna (0-" << COLUMNAS - 1 << "): ";
                 int col;
                 cin >> col;
 
-                if (isValidMove(col)) {
-                    encontrarFilaVacia(col);
+                if (movimientoValido(col)) {
+                    ponerFicha(col);
                     if (verificarGanador()) {
                         printBoard();
-                        cout << "¡Jugador " << currentPlayer << " ha ganado!" << endl;
-                        gameover = true;
+                        string s;
+                        cout << "¡Jugador " << jugadorActual << " ha ganado!" << endl;
+                        cout<<"Cualquier tecla para salir"<<endl;
+                        cin>>s;
+                        fin = true;
                     } else {
-                        currentPlayer = 2;
+                        jugadorActual = 2;
                     }
                 }
             } else {
-                int aiMove = getBestMove();
-                if (isValidMove(aiMove)) {
-                    encontrarFilaVacia(aiMove);
+                int movimientoIA = mejorMovimiento();
+                if (movimientoValido(movimientoIA)) {
+                    ponerFicha(movimientoIA);
                     if (verificarGanador()) {
                         printBoard();
+                        string s;
                         cout << "¡IA ha ganado!" << endl;
-                        gameover = true;
+                        cout<<"Cualquier tecla para salir"<<endl;
+                        cin>>s;
+                        fin = true;
                     } else {
-                        currentPlayer = 1;
+                        jugadorActual = 1;
                     }
                 }
             }

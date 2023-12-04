@@ -16,7 +16,9 @@ int menu(){
     int opcion;
     cout<<"#### BIENVENIDO ####"<<endl;
     cout<<" "<<endl;
-    cout<<"1) Jugar"<<endl;
+    cout<<"1) Jugar facil"<<endl;
+    cout<<"2) Jugar intermedio"<<endl;
+    cout<<"3) Jugar dificil"<<endl;
     cout<<"9) Salir"<<endl;
     cout<<"Elija una opcion: ";
     cin>>opcion;
@@ -25,9 +27,15 @@ int menu(){
 };
 
 void ejecutarOpcion(int opcion){
-    Tablero *tablero = new Tablero();
     if(opcion == 1){
-        tablero ->playAgainstAI();
+        Tablero *tablero = new Tablero(1);
+        tablero ->jugarContraPC();
+    }else if(opcion == 2){
+        Tablero *tablero = new Tablero(4);
+        tablero ->jugarContraPC();
+    }else if(opcion == 3){
+        Tablero *tablero = new Tablero(6);
+        tablero ->jugarContraPC();
     }else if(opcion == 9){
         cout<<"Hasta pronto"<<endl;
     }
